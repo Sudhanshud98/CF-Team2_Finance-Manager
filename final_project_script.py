@@ -1,10 +1,13 @@
 import dash
 from dash import dcc, html
+from dash.dependencies import Input, Output, State
 import plotly.express as px
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 import numpy as np
 import plotly.graph_objs as go
+import base64
+import io
 
 # Replace this with the path to your actual Excel file
 # file_path = 'path_to_your_file.xlsx'
@@ -71,6 +74,13 @@ app = dash.Dash(__name__)
 
 # Define the layout of the app
 app.layout = html.Div([
+dcc.Upload(
+        id='upload-data',
+        children=html.Button('Upload Excel File'),
+        multiple=False
+    ),
+    html.Div(id='output-data-upload'),
+
     dcc.Graph(
         id='stacked-bar-chart',
         figure=px.bar(df_combined, x='Month', y='Amount', color='Category', title='Monthly Expenses by Category', barmode='stack')
@@ -98,6 +108,35 @@ app.layout = html.Div([
         )
     )
 ])
+
+def parse_contents(contents, filename):
+    content_type, content_string = contents.split(',')
+
+    decoded = base64.b64decode(content_string)
+    try:
+        if 'csv' in filename:
+            # Assume that the user uploaded a CSV file
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+        elif 'xls' in filename:
+            # Assume that the user uploaded an Excel file
+            df = pd.read_excel(io.BytesIO(decoded))
+    except Exception as e:
+        print(e)
+        return html.Div(['There was an error processing this file.'])
+
+    return df
+
+@app.callback(Output('output-data-upload', 'children'),
+              [Input('upload-data', 'contents')],
+              [State('upload-data', 'filename')])
+def update_output(contents, filename):
+    if contents is not None:
+        df = parse_contents(contents, filename)
+        # Perform your data processing and visualization here using the new DataFrame (df)
+        # Update the charts accordingly
+        return html.Div([
+            html.H5(f'File uploaded: {filename}'),
+        ])
 
 # Run the Dash app
 if __name__ == '__main__':
