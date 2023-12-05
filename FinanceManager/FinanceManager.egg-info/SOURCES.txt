@@ -1,0 +1,9 @@
+setup.py
+FinanceManager.egg-info/PKG-INFO
+FinanceManager.egg-info/SOURCES.txt
+FinanceManager.egg-info/dependency_links.txt
+FinanceManager.egg-info/entry_points.txt
+FinanceManager.egg-info/requires.txt
+FinanceManager.egg-info/top_level.txt
+finance_manager_app/__init__.py
+finance_manager_app/final_project_script.py

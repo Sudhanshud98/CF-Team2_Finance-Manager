@@ -1,0 +1,2 @@
+[console_scripts]
+finance_manager_app = FinanceManager.finance_manager_app.final_project_script:app.run_server
